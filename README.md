@@ -70,9 +70,7 @@ This will start both the application server and Ollama service in containers.
 Send POST requests to `/conversation` endpoint:
 
 ```bash
-curl -X POST http://localhost:8080/conversation \
-  -H "Content-Type: application/json" \
-  -d '{"text": "How do cats express love?"}'
+curl -X POST http://localhost:8080/conversation -H "Content-Type: application/json" -d "{\"text\": \"How do cats express love?\"}"'
 ```
 
 The system will:
