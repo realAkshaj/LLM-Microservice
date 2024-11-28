@@ -1,0 +1,35 @@
+services:
+  server:
+    image: 637423449380.dkr.ecr.us-east-1.amazonaws.com/llm-microservice:latest
+    ports:
+      - "8080:8080"
+    environment:
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_REGION=${AWS_REGION}
+      - JAVA_OPTS=-Xmx1g -Xms512m
+      - OLLAMA_HOST=http://ollama:11434
+    volumes:
+      - conversation_logs:/root/conversations
+    depends_on:
+      ollama:
+        condition: service_healthy
+
+  ollama:
+    image: ollama/ollama:latest
+    volumes:
+      - ollama_models:/root/.ollama
+    ports:
+      - "11434:11434"
+    healthcheck:
+      test: ["CMD", "pgrep", "ollama"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+volumes:
+  ollama_models:
+    driver: local
+  conversation_logs:
+    driver: local
