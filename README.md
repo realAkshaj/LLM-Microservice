@@ -142,6 +142,142 @@ The system implements robust error handling:
 sbt test
 ```
 
+## Detailed Docker Installation and Setup
+
+### Prerequisites
+- An AWS EC2 instance running Amazon Linux 2
+- AWS CLI installed
+- AWS credentials with ECR access
+- Open port 8080 in your security group
+
+### Step-by-Step Installation
+
+1. **Update System and Install Docker**
+   ```bash
+   # Update the package manager
+   sudo yum update -y
+   
+   # Install Docker
+   sudo yum install docker -y
+   
+   # Start Docker service
+   sudo service docker start
+   
+   # Add your user to docker group (requires re-login to take effect)
+   sudo usermod -a -G docker ec2-user
+   ```
+
+2. **Install Docker Compose**
+   ```bash
+   # Download Docker Compose binary
+   sudo curl -L "https://github.com/docker/compose/releases/download/v2.24.1/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+   
+   # Make it executable
+   sudo chmod +x /usr/local/bin/docker-compose
+   
+   # Enable Docker service on boot
+   sudo systemctl start docker
+   sudo systemctl enable docker
+   ```
+
+3. **Configure AWS Credentials**
+   ```bash
+   aws configure
+   ```
+   You'll be prompted to enter:
+   - AWS Access Key ID
+   - AWS Secret Access Key
+   - Default region (enter `us-east-1`)
+   - Output format (enter `json`)
+
+4. **Login to Amazon ECR**
+   ```bash
+   aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 637423449380.dkr.ecr.us-east-1.amazonaws.com
+   ```
+
+5. **Create and Setup Project Directory**
+   ```bash
+   mkdir llm-service
+   cd llm-service
+   ```
+
+6. **Deploy the Application**
+   ```bash
+   # Pull the latest images
+   docker-compose pull
+   
+   # Start the services in detached mode
+   docker-compose up -d
+   
+   # Verify containers are running
+   docker ps
+   
+   # Check application logs
+   docker logs llm-microservice
+   ```
+
+### Testing the Deployment
+
+You can test the deployment using curl. Replace `YOUR_EC2_PUBLIC_IP` with your EC2 instance's public DNS or IP:
+
+```bash
+# Using IP address
+curl -X POST http://YOUR_EC2_PUBLIC_IP:8080/conversation ^
+  -H "Content-Type: application/json" ^
+  -d '{"text":"How do cats express love?"}'
+
+# Using EC2 public DNS (example)
+curl -X POST http://ec2-18-212-178-224.compute-1.amazonaws.com:8080/conversation ^
+  -H "Content-Type: application/json" ^
+  -d '{"text": "How do cats express love?"}'
+```
+
+### Troubleshooting Docker Installation
+
+1. **If Docker fails to start:**
+   ```bash
+   sudo systemctl status docker
+   # Check logs for issues
+   sudo journalctl -u docker
+   ```
+
+2. **If permission issues occur:**
+   ```bash
+   # Re-login to refresh group membership
+   exit
+   # SSH back in
+   ```
+
+3. **If ECR login fails:**
+   - Verify AWS credentials
+   - Check IAM permissions
+   - Ensure correct region is set
+
+4. **If containers fail to start:**
+   ```bash
+   # Check detailed container logs
+   docker-compose logs
+   
+   # Check individual service logs
+   docker-compose logs server
+   docker-compose logs ollama
+   ```
+
+5. **Network Issues:**
+   - Verify security group settings
+   - Check if port 8080 is open
+   - Ensure no firewall is blocking traffic
+
+### Stopping the Application
+
+```bash
+# Stop the services
+docker-compose down
+
+# To also remove volumes
+docker-compose down -v
+```
+
 ## License
 
 This project is licensed under the MIT License.
