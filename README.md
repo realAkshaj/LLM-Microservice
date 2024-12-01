@@ -281,95 +281,81 @@ docker-compose down
 docker-compose down -v
 ```
 
-Docker Containerization and AWS Deployment Implementation
-1. Application Containerization
+# Docker Containerization and AWS Deployment Implementation
+
+## 1. Application Containerization
 I successfully containerized both parts of the application:
-Server Component
 
-Created a multi-stage Dockerfile utilizing hseeberger/scala-sbt for building and eclipse-temurin:17-jre-alpine for runtime
-Optimized image size by:
+### Server Component
+- Created a multi-stage Dockerfile utilizing `hseeberger/scala-sbt` for building and `eclipse-temurin:17-jre-alpine` for runtime
+- Optimized image size by:
+  - Using Alpine-based images
+  - Implementing multi-stage build to exclude build tools from final image
+  - Only copying necessary files
+- Exposed port 8080 for communication
+- Included all required dependencies through proper SBT configuration
 
-Using Alpine-based images
-Implementing multi-stage build to exclude build tools from final image
-Only copying necessary files
+### Service Component (Ollama)
+- Utilized official Ollama image
+- Implemented health checks for reliability
+- Configured volume mounting for model persistence
+- Exposed port 11434 for internal communication
 
-
-Exposed port 8080 for communication
-Included all required dependencies through proper SBT configuration
-
-Service Component (Ollama)
-
-Utilized official Ollama image
-Implemented health checks for reliability
-Configured volume mounting for model persistence
-Exposed port 11434 for internal communication
-
-2. AWS Deployment
+## 2. AWS Deployment
 Successfully deployed the application to AWS:
+- Server image pushed to ECR repository: `637423449380.dkr.ecr.us-east-1.amazonaws.com/llm-microservice`
+- Implemented proper AWS credential management through environment variables
+- The server component communicates with AWS Lambda for text generation
+- Ollama service runs alongside the main service for local LLM processing
 
-Server image pushed to ECR repository: 637423449380.dkr.ecr.us-east-1.amazonaws.com/llm-microservice
-Implemented proper AWS credential management through environment variables
-The server component communicates with AWS Lambda for text generation
-Ollama service runs alongside the main service for local LLM processing
-
-3. Networking
+## 3. Networking
 Implemented comprehensive networking setup:
+- Created Docker Compose configuration linking all services
+- Configured internal network for container communication
+- Set up volume sharing for logs and model data
+- Implemented health checks to ensure service availability
 
-Created Docker Compose configuration linking all services
-Configured internal network for container communication
-Set up volume sharing for logs and model data
-Implemented health checks to ensure service availability
-
-4. Testing and Verification
+## 4. Testing and Verification
 The application demonstrates successful integration:
+- Server successfully processes incoming HTTP requests
+- Lambda integration works for text generation
+- Ollama service provides local LLM capabilities
+- Conversation logs are properly stored
+- All components communicate seamlessly
 
-Server successfully processes incoming HTTP requests
-Lambda integration works for text generation
-Ollama service provides local LLM capabilities
-Conversation logs are properly stored
-All components communicate seamlessly
+## 5. Documentation and Code Quality
+- Provided detailed Dockerfile and docker-compose.yml
+- Implemented comprehensive logging
+- Created detailed setup instructions
+- Used best practices for container configuration
+- Optimized image sizes through multi-stage builds
 
-5. Documentation and Code Quality
+## 6. Additional Features
+- Implemented conversation logging
+- Added robust error handling
+- Created health check mechanisms
+- Configured proper timeout handling
+- Added AWS credential management
 
-Provided detailed Dockerfile and docker-compose.yml
-Implemented comprehensive logging
-Created detailed setup instructions
-Used best practices for container configuration
-Optimized image sizes through multi-stage builds
+## Challenges and Solutions
+1. **Timeout Issues**
+   - Solution: Implemented proper timeout configurations
+   - Added retry mechanisms for model loading
 
-6. Additional Features
+2. **Container Communication**
+   - Solution: Created proper networking configuration
+   - Implemented service dependencies
 
-Implemented conversation logging
-Added robust error handling
-Created health check mechanisms
-Configured proper timeout handling
-Added AWS credential management
+3. **AWS Integration**
+   - Solution: Used environment variables for credentials
+   - Implemented proper error handling for AWS services
 
-Challenges and Solutions
+4. **Image Optimization**
+   - Solution: Used multi-stage builds
+   - Implemented Alpine-based images
 
-Timeout Issues
-
-Solution: Implemented proper timeout configurations
-Added retry mechanisms for model loading
-
-
-Container Communication
-
-Solution: Created proper networking configuration
-Implemented service dependencies
-
-
-AWS Integration
-
-Solution: Used environment variables for credentials
-Implemented proper error handling for AWS services
-
-
-Image Optimization
-
-Solution: Used multi-stage builds
-Implemented Alpine-based images
-
+## Conclusion
+The implementation successfully meets all requirements by providing a containerized, scalable solution that effectively integrates AWS services with local LLM capabilities while maintaining proper separation of concerns and following Docker best practices.
 ## License
 
 This project is licensed under the MIT License.
