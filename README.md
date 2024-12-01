@@ -2,6 +2,9 @@
 
 This project implements a conversational agent system that combines AWS Bedrock (via Lambda) and Ollama to create an interactive chat experience. The system uses a microservices architecture with Akka HTTP for the server implementation and supports Docker deployment.
 
+Video link - https://youtu.be/zWOe9C6i96g
+A brief overview of the project
+
 ## Architecture Overview
 
 The system consists of several key components:
