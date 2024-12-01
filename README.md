@@ -8,7 +8,7 @@ A brief overview of the project
 ## Architecture Overview
 
 The system consists of several key components:
-1. **Akka HTTP Server**: Handles incoming gRPC requests and manages the conversation flow
+1. **Akka HTTP Server**: Handles incoming requests and manages the conversation flow
 2. **AWS Lambda Integration**: Processes queries using Amazon Bedrock's Titan Text Lite model
 3. **Ollama Integration**: Local LLM service for generating follow-up responses
 4. **Conversation Logger**: Records all interactions in timestamped files
